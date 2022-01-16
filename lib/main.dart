@@ -1,49 +1,44 @@
-import 'package:flutter/material.dart';
-import 'package:flame/flame.dart';
+import 'dart:async';
 
-void main() {
-  runApp(MyApp());
+import 'package:flame/flame.dart';
+import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
+import 'package:katarin/widgets/pause_menu.dart';
+import 'package:katarin/components/rocket_component.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Flame.device.setLandscape();
+
+  final game = MoonlanderGame();
+
+  runApp(
+    MaterialApp(
+      home: GameWidget(
+        game: game,
+        loadingBuilder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        errorBuilder: (context, err) {
+          debugPrint(err.toString());
+          return const Center(
+            child: Text('Sorry, somthing went wrong. Reload me'),
+          );
+        },
+        overlayBuilderMap: {
+          'pause': (context, MoonlanderGame game) => PauseMenu(game: game),
+        },
+      ),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+/// This class encapulates the whole game.
+class MoonlanderGame extends FlameGame with HasCollidables {
   @override
-  Widget build(BuildContext context) {
-    return Container();
+  Future<void> onLoad() async {
+    unawaited(add(RocketComponent(position: size / 2, size: Vector2.all(20))));
+
+    return super.onLoad();
   }
 }
-
-
-// class MyCrate extends SpriteComponent {
-//   // creates a component that renders the crate.png sprite, with size 16 x 16
-//   MyCrate() : super(size: Vector2.all(16));
-
-//   Future<void> onLoad() async {
-//     sprite = await Sprite.load('crate.png');
-//     anchor = Anchor.center;
-//   }
-
-//   @override
-//   void onGameResize(Vector2 gameSize) {
-//     super.onGameResize(gameSize);
-//     // We don't need to set the position in the constructor, we can set it directly here since it will
-//     // be called once before the first time it is rendered.
-//     position = gameSize / 2;
-//   }
-// }
-
-// class MyGame extends FlameGame {
-//   @override
-//   Future<void> onLoad() async {
-//     await super.onLoad();
-//     add(MyCrate());
-//   }
-// }
-
-// main() {
-//   final myGame = MyGame();
-//   runApp(
-//     GameWidget(
-//       game: myGame,
-//     ),
-//   );
-// }
