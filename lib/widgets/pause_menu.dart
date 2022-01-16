@@ -36,7 +36,7 @@ class PauseMenu extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     game.overlays.remove('pause');
-                    // game.restart();
+                    game.restart();
                   },
                   child: const Text('Restart'),
                 ),

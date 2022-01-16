@@ -13,6 +13,7 @@ class PauseComponent extends SpriteComponent
   @override
   bool get isHud => true;
 
+  //HasGameRef offers a clean way to get the current game instance your component is connected to.
   @override
   bool onTapDown(TapDownInfo info) {
     if (gameRef.overlays.isActive('pause')) {
