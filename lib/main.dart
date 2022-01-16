@@ -127,7 +127,7 @@ class MoonlanderGame extends FlameGame
         RocketComponent(
           position: size / 2,
           size: Vector2(32, 48),
-          // animation: rocketAnimation,
+          animation: rocketAnimation,
         ),
       ),
     );
