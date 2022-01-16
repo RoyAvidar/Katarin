@@ -39,7 +39,7 @@ Future<void> main() async {
 
 /// This class encapulates the whole game.
 class MoonlanderGame extends FlameGame
-    with HasCollidables, HasKeyboardHandlerComponents {
+    with HasCollidables, HasTappables, HasKeyboardHandlerComponents {
   void onOverlayChanged() {
     if (overlays.isActive('pause')) {
       pauseEngine();
