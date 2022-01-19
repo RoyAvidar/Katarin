@@ -42,7 +42,7 @@ enum RocketHeading {
 }
 
 class RocketComponent extends SpriteAnimationGroupComponent<RocketState>
-    with HasHitboxes, Collidable, KeyboardHandler {
+    with HasHitboxes, Collidable, HasGameRef<MoonlanderGame> {
   /// Create a new Rocket component at the given [position].
   RocketComponent({
     required Vector2 position,
@@ -59,6 +59,57 @@ class RocketComponent extends SpriteAnimationGroupComponent<RocketState>
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    //Load all sprites and create the animation map
+    const stepTime = .3;
+    final textureSize = Vector2(16, 24);
+    const frameCount = 2;
+    final idle = await gameRef.loadSpriteAnimation(
+      'ship_animation_idle.png',
+      SpriteAnimationData.sequenced(
+        amount: frameCount,
+        stepTime: stepTime,
+        textureSize: textureSize,
+      ),
+    );
+    final left = await gameRef.loadSpriteAnimation(
+      'ship_animation_left.png',
+      SpriteAnimationData.sequenced(
+        amount: frameCount,
+        stepTime: stepTime,
+        textureSize: textureSize,
+      ),
+    );
+    final right = await gameRef.loadSpriteAnimation(
+      'ship_animation_right.png',
+      SpriteAnimationData.sequenced(
+        amount: frameCount,
+        stepTime: stepTime,
+        textureSize: textureSize,
+      ),
+    );
+    final farRight = await gameRef.loadSpriteAnimation(
+      'ship_animation_far_right.png',
+      SpriteAnimationData.sequenced(
+        amount: frameCount,
+        stepTime: stepTime,
+        textureSize: textureSize,
+      ),
+    );
+    final farLeft = await gameRef.loadSpriteAnimation(
+      'ship_animation_far_left.png',
+      SpriteAnimationData.sequenced(
+        amount: frameCount,
+        stepTime: stepTime,
+        textureSize: textureSize,
+      ),
+    );
+    animations = {
+      RocketState.idle: idle,
+      RocketState.left: left,
+      RocketState.right: right,
+      RocketState.farLeft: farLeft,
+      RocketState.farRight: farRight
+    };
     current = RocketState.idle;
     addHitbox(HitboxRectangle());
   }

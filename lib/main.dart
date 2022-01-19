@@ -13,7 +13,7 @@ import 'package:katarin/components/rocket_component.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Flame.device.setLandscape();
-
+  await Flame.device.fullScreen();
   final game = MoonlanderGame();
 
   runApp(
@@ -70,7 +70,7 @@ class MoonlanderGame extends FlameGame
 
   @override
   Future<void> onLoad() async {
-    final pausButton = await Sprite.load('PauseButton.png');
+    final pauseButton = await Sprite.load('PauseButton.png');
     const stepTime = .3;
     final textureSize = Vector2(16, 24);
     const frameCount = 2;
@@ -131,7 +131,22 @@ class MoonlanderGame extends FlameGame
         ),
       ),
     );
-    unawaited(add(PauseComponent(position: Vector2(0, 0), sprite: pausButton)));
+    unawaited(
+      add(
+        PauseComponent(
+          margin: const EdgeInsets.all(5),
+          sprite: await Sprite.load('PauseButton.png'),
+          spritePressed: await Sprite.load('pause_button_invert.png'),
+          onPressed: () {
+            if (overlays.isActive('pause')) {
+              overlays.remove('pause');
+            } else {
+              overlays.add('pause');
+            }
+          },
+        ),
+      ),
+    );
     //Only in debug mode, add 3s wait to simulate loading
     /*if (kDebugMode) {
       await Future<void>.delayed(const Duration(seconds: 3));
