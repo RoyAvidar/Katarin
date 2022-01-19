@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
@@ -7,7 +8,11 @@ import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:katarin/components/map_component.dart';
 import 'package:katarin/components/pause_component.dart';
+import 'package:katarin/components/rocket_info.dart';
+import 'package:katarin/fixed_vertical_resolution_viewport.dart';
+import 'package:katarin/game_state.dart';
 import 'package:katarin/widgets/pause_menu.dart';
 import 'package:katarin/components/rocket_component.dart';
 
@@ -54,11 +59,15 @@ class MoonlanderGame extends FlameGame
   }
 
   @override
-  bool get debugMode => kDebugMode;
+  bool get debugMode => GameState.showDebugInfo;
 
   /// Restart the current level.
   void restart() {
     // TODO: Implement restart of current level.
+    GameState.playState = PlayingState.palying;
+    final rocket = children.firstWhere((child) => child is RocketComponent)
+        as RocketComponent;
+    rocket.reset();
   }
 
   @override
@@ -81,50 +90,60 @@ class MoonlanderGame extends FlameGame
       columns: 6,
       rows: 1,
     );
+    camera.viewport = FixedVerticalResolutionViewport(800);
+
+    ///Ensure our joystick knob is between 50 and 100 based on view height
+    ///Important its based on device size not viewport size
+    ///8.2 is the "magic" hud joystick factor... ;)
+    final knobSize = min(max(50, size.y / 8.2), 100).toDouble();
+
     final joystick = JoystickComponent(
       knob: SpriteComponent(
         sprite: sheet.getSpriteById(1),
-        size: Vector2.all(50),
+        size: Vector2.all(knobSize),
       ),
       background: SpriteComponent(
         sprite: sheet.getSpriteById(0),
-        size: Vector2.all(100),
+        size: Vector2.all(knobSize * 1.5),
       ),
-      margin: const EdgeInsets.only(left: 20, bottom: 20),
+      margin: const EdgeInsets.only(left: 10, bottom: 10),
     );
-
-    unawaited(
-      add(
-        RocketComponent(
-          position: size / 2,
-          size: Vector2(32, 48),
-          joystick: joystick,
-        ),
-      ),
+    final rocket = RocketComponent(
+      position: size / 2,
+      size: Vector2(32, 48),
+      joystick: joystick,
     );
+    unawaited(add(rocket));
     unawaited(add(joystick));
-
+    unawaited(add(MapComponent()));
+    unawaited(add(RocketInfo(rocket)));
     unawaited(
       add(
         PauseComponent(
-          margin: const EdgeInsets.all(5),
+          margin: const EdgeInsets.only(
+            top: 10,
+            left: 5,
+          ),
           sprite: await Sprite.load('PauseButton.png'),
           spritePressed: await Sprite.load('pause_button_invert.png'),
           onPressed: () {
             if (overlays.isActive('pause')) {
               overlays.remove('pause');
+              if (GameState.playState == PlayingState.paused) {
+                GameState.playState = PlayingState.palying;
+              }
             } else {
+              if (GameState.playState == PlayingState.palying) {
+                GameState.playState = PlayingState.paused;
+              }
+
               overlays.add('pause');
             }
           },
         ),
       ),
     );
-    //Only in debug mode, add 3s wait to simulate loading
-    /*if (kDebugMode) {
-      await Future<void>.delayed(const Duration(seconds: 3));
-    }
-    */
+
     overlays.addListener(onOverlayChanged);
     return super.onLoad();
   }
