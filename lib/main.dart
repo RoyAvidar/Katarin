@@ -90,7 +90,7 @@ class MoonlanderGame extends FlameGame
       columns: 6,
       rows: 1,
     );
-    camera.viewport = FixedVerticalResolutionViewport(800);
+    camera.viewport = FixedVerticalResolutionViewport(400);
 
     ///Ensure our joystick knob is between 50 and 100 based on view height
     ///Important its based on device size not viewport size

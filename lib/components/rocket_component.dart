@@ -248,5 +248,6 @@ class RocketComponent extends SpriteAnimationGroupComponent<RocketState>
     _velocity.scale(0);
     current = RocketState.idle;
     angle = 0;
+    _fuel = 100;
   }
 }
