@@ -113,6 +113,7 @@ class MoonlanderGame extends FlameGame
       size: Vector2(32, 48),
       joystick: joystick,
     );
+    camera.followComponent(rocket);
     unawaited(add(rocket));
     unawaited(add(joystick));
     unawaited(add(MapComponent()));
